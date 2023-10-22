@@ -132,7 +132,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.status == "success") {
                     alert('Registration successful! You can now log in.');
                     window.location.href = 'login.html'; // Redirect to login page after successful registration
                 } else {
