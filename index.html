@@ -7,8 +7,9 @@
 </head>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-    *{
+    * {
         font-family: 'Pixelify Sans', sans-serif;
+        position: static;
     }
     body {
         text-align: center;
@@ -18,14 +19,73 @@
         align-items: center;
         height: 90vh;
         flex-direction: column;
-        position: fixed;
+        position: static;
         width: 100%;
+    }
+    button {
+        padding: 10px 10px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px; /* Space below the container */
+    }
+    canvas {
+        margin-right: 20px; /* Space between canvas and table */
+    }
+    table {
+        display: none; /* Initially hide the table */
+        border-collapse: collapse;
+        width: 80%;
+    }
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+    thead {
+        background-color: #f2f2f2;
+    }
+    tr:hover {
+        background-color: #f5f5f5;
     }
 </style>
 <body>
     <h1>Pong!</h1>
-    <canvas></canvas>
+    <div class="container">
+        <canvas></canvas>
+        <div id="leaderboard">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="scoresTableBody">
+                    <!-- High scores will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
     <p>Control the left player with W and S keys</p>
+    <div id="buttons">
+        <button id="logoutButton">Logout</button>
+        <button id="getallusersButton">Get All Users (Console)</button>
+        <button id="getprofileuserButton">Get Profile User (Console)</button>
+        <button id="getscoreButton">Display High Score (Toggle)</button>
+        <button id="submithighscoreButton">Submit High Score</button>
+    </div>
     <script src="/script.js"></script>
 </body>
 </html>

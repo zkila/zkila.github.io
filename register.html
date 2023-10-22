@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong!</title>
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    *{
+        font-family: 'Pixelify Sans', sans-serif;
+    }
+    body {
+        text-align: center;
+        background-color: ghostwhite;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        flex-direction: column;
+        position: fixed;
+        width: 100%;
+    }
+    #registerForm {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    }
+
+    /* Style the labels */
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    /* Style the input fields */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 3px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Style the submit button */
+    input[type="submit"] {
+        background-color: #45a049;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #4CAF50;
+    }
+
+    /* Style the "Register here" link */
+    p a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    p a:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    <h1>Register for Pong!</h1>
+    <form id="registerForm">
+        <label for="username">Nama:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="password">Password (1 uppercase, 1 lowercase, 1 number, 1 symbol):</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+        <br>
+        <input type="submit" value="Register">
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const nama = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+
+            // Password validation regex: requires 1 uppercase, 1 lowercase, 1 number, and 1 symbol
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&!])[A-Za-z\d@#$%^&!]{8,}$/;
+
+            if (!password.match(passwordRegex)) {
+                alert('Password must contain 1 uppercase letter, 1 lowercase letter, 1 number, and 1 symbol.');
+                return;
+            }
+
+            if (password !== confirm_password) {
+                alert('Passwords do not match. Please try again.');
+                return;
+            }
+
+            // Perform registration (send data to the server)
+            const registrationData = {
+                nama: nama,
+                email: email,
+                password: password
+            };
+
+            // Send a POST request to the server for registration (similar to the previous example)
+            fetch('https://ets-pemrograman-web-f.cyclic.app/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registrationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration successful! You can now log in.');
+                    window.location.href = 'login.html'; // Redirect to login page after successful registration
+                } else {
+                    alert('Registration failed. Please choose a different username or email.');
+                    console.log(response)
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

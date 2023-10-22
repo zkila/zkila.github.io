@@ -1,3 +1,136 @@
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+    // User is not logged in, redirect to the login page or take appropriate action
+    window.location.href = 'login.html';
+
+}
+
+const logoutButton = document.getElementById('logoutButton');
+
+logoutButton.addEventListener('click', function() {
+    // Clear the login state from local storage
+    localStorage.removeItem('isLoggedIn');
+
+    // Redirect the user to the login page (or wherever you want)
+    window.location.href = 'login.html';
+});
+
+const accessToken = localStorage.getItem('access_token');
+const getallusersButton = document.getElementById('getallusersButton');
+const getprofileuserButton = document.getElementById('getprofileuserButton');
+const getscoreButton = document.getElementById('getscoreButton');
+const submithighscoreButton = document.getElementById('submithighscoreButton');
+
+getallusersButton.addEventListener('click', function() {
+    // console.log(accessToken)
+    fetch('https://ets-pemrograman-web-f.cyclic.app/users', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        },
+    })
+    .then((response)=>response.json())
+    .then((data)=>console.log(data))
+});
+
+getprofileuserButton.addEventListener('click', function() {
+    // console.log(accessToken)
+    fetch('https://ets-pemrograman-web-f.cyclic.app/users/profile', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        },
+    })
+    .then((response)=>response.json())
+    .then((data)=>{
+        console.log(data)
+        localStorage.setItem('nama', data.data.nama);
+    })
+});
+
+const scoresTable = document.querySelector('table');
+getscoreButton.addEventListener('click', function() {
+    // console.log(accessToken)
+    fetch('https://ets-pemrograman-web-f.cyclic.app/scores/score', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        },
+    })
+    .then((response)=>response.json())
+    .then((data)=>{
+        if (scoresTable.style.display === 'none') {
+            displayHighScores(data.data);
+            showTable();
+            console.log(data)
+        }
+        else{
+            hideTable();
+        }
+    })
+});
+
+var HighScores = {
+    scores: [],
+};
+HighScores.addScore = function (name, score) {
+    var entry = { name: name, score: score };
+    this.scores.push(entry);
+    this.scores.sort(function (a, b) {
+      return b.score - a.score; // Sort in descending order
+    });
+};
+HighScores.displayScores = function () {
+    console.log("High Scores:");
+    for (var i = 0; i < this.scores.length; i++) {
+    console.log((i + 1) + ". " + localStorage.getItem('nama')+ ": " + this.scores[i].score);
+    }
+};
+
+submithighscoreButton.addEventListener('click', function() {
+    // console.log(localStorage.getItem('nama'))
+    const playerName = prompt('Please enter your name:');
+    
+    if (playerName) { // Check if the user provided a name (not canceled)
+        fetch('https://ets-pemrograman-web-f.cyclic.app/scores/score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                nama: playerName,
+                score: HighScores.scores[0].score.toString()
+            })
+        })
+        .then((response) => response.json())
+        .then((data) => console.log(data));
+    }
+});
+function showTable() {
+    const table = document.querySelector('table');
+    table.style.display = 'block';
+}
+function hideTable() {
+    scoresTable.style.display = 'none';
+}
+function displayHighScores(highScores) {
+    const scoresTableBody = document.getElementById('scoresTableBody');
+    scoresTableBody.innerHTML = ''; // Clear the previous scores
+    highScores.sort((a, b) => b.score - a.score);
+
+    highScores.slice(0, 3).forEach((score) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${score.nama}</td>
+            <td>${score.score}</td>
+        `;
+        scoresTableBody.appendChild(row);
+    });
+}
+//------------------------------------------------------------------------------------------------------------------------------
 var DIRECTION = {
     IDLE: 0,
     UP: 1,
@@ -6,7 +139,7 @@ var DIRECTION = {
     RIGHT: 4
 };
 
-var rounds = [5,5,3,3,2];
+var rounds = [5,10,13,16,18];
 var colors = ['#5269ff', '#399934', '#d9d957', '#ffa352', '#ff5252'];
 
 // The ball object (The cube that bounces back and forth)
@@ -87,6 +220,9 @@ var Game = {
         );
 
         setTimeout(function () {
+            // console.log(Pong.player.score);
+            HighScores.addScore("Player", Pong.player.score); // Add the player's score
+            HighScores.displayScores(); // Display the high scores
             Pong = Object.assign({}, Game);
             Pong.initialize();
         }, 3000);
@@ -196,7 +332,8 @@ var Game = {
             } else {
                 // If there is another round, reset all the values and increment the round number.
                 //this.color = this._generateRoundColor();
-                this.player.score = this.ai.score = 0;
+                // this.player.score = this.ai.score = 0;
+                this.ai.score = this.player.score;
                 this.player.speed += 1;
                 this.ai.speed += 1;
                 this.ball.speed += 1;
